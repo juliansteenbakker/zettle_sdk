@@ -223,6 +223,55 @@ cd ios
 pod install
 ```
 
+#### 3. Required Info.plist Configuration
+
+Add the following to your `ios/Runner/Info.plist`:
+
+```xml
+<!-- Bluetooth Permissions -->
+<key>NSLocationWhenInUseUsageDescription</key>
+<string>Location is required to connect to Zettle card readers via Bluetooth</string>
+<key>NSBluetoothAlwaysUsageDescription</key>
+<string>Bluetooth is required to connect to Zettle card readers for payment processing</string>
+<key>NSBluetoothPeripheralUsageDescription</key>
+<string>Bluetooth is required to connect to Zettle card readers for payment processing</string>
+
+<!-- External Accessory Protocol for Card Reader -->
+<key>UISupportedExternalAccessoryProtocols</key>
+<array>
+    <string>com.izettle.cardreader-one</string>
+</array>
+```
+
+#### 4. Enable Background Modes
+
+**Option A: Via Info.plist (Recommended for Flutter)**
+
+Add to your `ios/Runner/Info.plist`:
+
+```xml
+<key>UIBackgroundModes</key>
+<array>
+    <string>external-accessory</string>
+    <string>bluetooth-central</string>
+</array>
+```
+
+**Option B: Via Xcode UI**
+
+1. Open your iOS project in Xcode (`ios/Runner.xcworkspace`)
+2. Select your app target
+3. Go to **Signing & Capabilities** tab
+4. Click **+ Capability**
+5. Add **Background Modes**
+6. Enable these checkboxes:
+   - ✅ **External accessory communication**
+   - ✅ **Uses Bluetooth LE accessories**
+
+These background modes allow the app to maintain connection with Zettle card readers when in the background.
+
+**Note:** MFi (Made for iPhone/iPad) program approval from Apple is required before releasing apps supporting Zettle card readers to the App Store.
+
 ## Usage
 
 ### 1. Initialize the SDK
@@ -411,32 +460,37 @@ try {
 }
 ```
 
-### 10. Settings Screens (Android Only)
+### 10. Settings Screens
 
 Open native settings screens for configuration:
 
 ```dart
 try {
-  // Open card reader settings
+  // Android: Opens specific settings screen based on type
+  // iOS: Opens unified settings view (type parameter is ignored)
   await zettleSdk.openSettings(SettingsScreenType.cardReader);
-
-  // Open manual card entry activation
-  await zettleSdk.openSettings(SettingsScreenType.manualCardEntry);
-
-  // Open PayPal QRC settings
-  await zettleSdk.openSettings(SettingsScreenType.qrcPayPal);
-
-  // Open Venmo QRC settings
-  await zettleSdk.openSettings(SettingsScreenType.qrcVenmo);
-
-  // Open tipping settings
-  await zettleSdk.openSettings(SettingsScreenType.tipping);
 } on ZettleException catch (e) {
   print('Failed to open settings: ${e.message}');
 }
 ```
 
-**Note:** Settings screens are only available on Android. On iOS, settings are managed within the payment flows.
+**Platform Differences:**
+
+- **Android**: Provides separate settings screens for each type:
+  - `SettingsScreenType.cardReader` - Card reader settings
+  - `SettingsScreenType.manualCardEntry` - Manual card entry activation
+  - `SettingsScreenType.qrcPayPal` - PayPal QRC settings
+  - `SettingsScreenType.qrcVenmo` - Venmo QRC settings
+  - `SettingsScreenType.tipping` - Tipping configuration
+
+- **iOS**: Provides a unified settings view that includes:
+  - Account switching
+  - FAQ documentation
+  - Card reader settings
+  - Payment method configuration (PayPal QRC, etc.)
+  - Tipping settings
+
+  On iOS, the `settingsType` parameter is ignored and the unified settings view is always shown.
 
 ## API Reference
 
@@ -629,13 +683,14 @@ Allow developers to configure payment timeout durations.
 
 ### Platform-Specific Limitations
 
-#### iOS Settings Screens
-iOS SDK does not provide standalone settings screens like Android. Settings are managed within payment flows. This is a native SDK limitation, not a plugin limitation.
+#### Settings Screen Differences
+- **Android**: Provides separate settings screens for different features (card reader, manual entry, QRC, tipping)
+- **iOS**: Provides a unified settings view that includes all settings in one screen
 
 #### Android vs iOS Feature Parity
 Some features have platform-specific availability:
 - **Installments:** Android only (not available in iOS SDK)
-- **Settings Screens:** Android only (iOS manages settings within flows)
+- **Separate Settings Screens:** Android only (iOS has unified settings view)
 - **BN Code (Manual Card Entry):** Android only
 
 ### Current Implementation Status
@@ -651,7 +706,7 @@ Some features have platform-specific availability:
 | Manual Card Entry Refunds | ✅ | ✅ | Complete |
 | Tipping Configuration | ✅ | ✅ | Complete |
 | Installments | ✅ | N/A | Complete (Android only) |
-| Settings Screens | ✅ | N/A | Complete (Android only) |
+| Settings Screens | ✅ | ✅ | Complete (unified view on iOS) |
 | Retrieve Card Payment | ⚠️ | ✅ | iOS only |
 | Retrieve MCE Payment | ❌ | ✅ | iOS only |
 | Retrieve QRC Payment | ❌ | ❌ | Not implemented |
