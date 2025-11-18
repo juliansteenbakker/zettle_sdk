@@ -10,6 +10,20 @@ class MethodChannelZettleSdk extends ZettleSdkPlatform {
   @visibleForTesting
   final methodChannel = const MethodChannel('zettle_sdk');
 
+  /// The event channel for auth state changes
+  @visibleForTesting
+  final authStateChannel = const EventChannel('zettle_sdk/auth_state');
+
+  Stream<bool>? _authStateStream;
+
+  @override
+  Stream<bool> get authStateStream {
+    _authStateStream ??= authStateChannel
+        .receiveBroadcastStream()
+        .map((event) => event as bool);
+    return _authStateStream!;
+  }
+
   @override
   Future<String?> getPlatformVersion() async {
     final version = await methodChannel.invokeMethod<String>('getPlatformVersion');

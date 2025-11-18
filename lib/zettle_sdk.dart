@@ -45,6 +45,29 @@ class ZettleSdk {
     return ZettleSdkPlatform.instance.isLoggedIn();
   }
 
+  /// Stream of authentication state changes
+  ///
+  /// Emits `true` when user is logged in, `false` when logged out.
+  /// Subscribe to this stream to react to authentication state changes in real-time.
+  ///
+  /// The stream emits the current auth state immediately when you subscribe, and
+  /// then emits updates whenever the user logs in or logs out.
+  ///
+  /// Example:
+  /// ```dart
+  /// ZettleSdk().authStateStream.listen((isLoggedIn) {
+  ///   print('User logged in: $isLoggedIn');
+  ///   if (isLoggedIn) {
+  ///     // User is authenticated, enable payment features
+  ///   } else {
+  ///     // User is not authenticated, show login button
+  ///   }
+  /// });
+  /// ```
+  Stream<bool> get authStateStream {
+    return ZettleSdkPlatform.instance.authStateStream;
+  }
+
   /// Process a card payment
   ///
   /// [amount] - Payment amount in cents (e.g., 1000 = $10.00)

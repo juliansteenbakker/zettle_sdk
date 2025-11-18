@@ -36,11 +36,21 @@ class _ZettleExampleState extends State<ZettleExample> {
   bool _isLoggedIn = false;
   String _statusMessage = 'Not initialized';
   String? _lastPaymentReference;
-  final _amountController = TextEditingController(text: '1000');
+  final _amountController = TextEditingController(text: '100'); // 1 euro minimum
 
   @override
   void initState() {
     super.initState();
+    // Listen to auth state changes
+    _zettleSdk.authStateStream.listen((isLoggedIn) {
+      if (mounted) {
+        setState(() {
+          _isLoggedIn = isLoggedIn;
+          _statusMessage = isLoggedIn ? 'Logged in' : 'Not logged in';
+        });
+      }
+    });
+
     _initialize();
   }
 
@@ -52,15 +62,13 @@ class _ZettleExampleState extends State<ZettleExample> {
       await _zettleSdk.initialize(ZettleConfig(
         clientId: 'YOUR_CLIENT_ID',
         redirectUrl: 'zettleexample://zettle/callback',
-        isDevMode: true, // Set to false for production
+        isDevMode: false, // Set to false for production
       ));
 
       setState(() {
         _isInitialized = true;
         _statusMessage = 'SDK initialized successfully';
       });
-
-      await _checkLoginStatus();
     } on ZettleException catch (e) {
       setState(() {
         _statusMessage = 'Initialization failed: ${e.message}';
@@ -84,6 +92,16 @@ class _ZettleExampleState extends State<ZettleExample> {
 
   Future<void> _login() async {
     try {
+      // Check login status first to see if already logged in
+      await _checkLoginStatus();
+
+      if (_isLoggedIn) {
+        setState(() {
+          _statusMessage = 'Already logged in';
+        });
+        return;
+      }
+
       await _zettleSdk.login();
       await _checkLoginStatus();
     } on ZettleException catch (e) {
@@ -108,7 +126,8 @@ class _ZettleExampleState extends State<ZettleExample> {
   }
 
   Future<void> _processPayment() async {
-    if (!_isLoggedIn) {
+    // Android requires explicit login, iOS handles auth automatically
+    if (!_isLoggedIn && Platform.isAndroid) {
       setState(() {
         _statusMessage = 'Please log in first';
       });
@@ -116,7 +135,16 @@ class _ZettleExampleState extends State<ZettleExample> {
     }
 
     try {
-      final amount = int.tryParse(_amountController.text) ?? 1000;
+      final amount = int.tryParse(_amountController.text) ?? 100;
+
+      // Validate minimum amount (1 euro = 100 cents)
+      if (amount < 100) {
+        setState(() {
+          _statusMessage = 'Minimum amount is 100 cents (€1.00 / \$1.00)';
+        });
+        return;
+      }
+
       final reference = 'payment_${DateTime.now().millisecondsSinceEpoch}';
 
       setState(() {
@@ -132,7 +160,7 @@ class _ZettleExampleState extends State<ZettleExample> {
         _lastPaymentReference = result.referenceId;
         _statusMessage = 'Payment successful!\n'
             'Reference: ${result.referenceId}\n'
-            'Amount: \$${(result.amount / 100).toStringAsFixed(2)}\n'
+            'Amount: €${(result.amount / 100).toStringAsFixed(2)}\n'
             'Card: ${result.cardBrand ?? 'Unknown'}';
       });
     } on ZettleException catch (e) {
@@ -163,7 +191,7 @@ class _ZettleExampleState extends State<ZettleExample> {
 
       setState(() {
         _statusMessage = 'Refund successful!\n'
-            'Refunded: \$${(result.refundedAmount / 100).toStringAsFixed(2)}';
+            'Refunded: €${(result.refundedAmount / 100).toStringAsFixed(2)}';
       });
     } on ZettleException catch (e) {
       setState(() {
@@ -220,7 +248,16 @@ class _ZettleExampleState extends State<ZettleExample> {
                             color: _isLoggedIn ? Colors.green : Colors.red,
                           ),
                           const SizedBox(width: 8),
-                          Text(_isLoggedIn ? 'Authenticated' : 'Not authenticated'),
+                          Expanded(
+                            child: Text(_isLoggedIn ? 'Authenticated' : 'Not authenticated'),
+                          ),
+                          if (_isInitialized)
+                            IconButton(
+                              icon: const Icon(Icons.refresh),
+                              tooltip: 'Refresh login status',
+                              onPressed: _checkLoginStatus,
+                              iconSize: 20,
+                            ),
                         ],
                       ),
                     ],
@@ -245,28 +282,62 @@ class _ZettleExampleState extends State<ZettleExample> {
 
               // Authentication Section
               if (_isInitialized) ...[
-                if (!_isLoggedIn)
-                  ElevatedButton.icon(
-                    onPressed: _login,
-                    icon: const Icon(Icons.login),
-                    label: const Text('Login to Zettle'),
-                  )
-                else
-                  ElevatedButton.icon(
-                    onPressed: _logout,
-                    icon: const Icon(Icons.logout),
-                    label: const Text('Logout'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
-                      foregroundColor: Colors.white,
+                if (Platform.isAndroid) ...[
+                  // Android requires explicit login
+                  if (!_isLoggedIn)
+                    ElevatedButton.icon(
+                      onPressed: _login,
+                      icon: const Icon(Icons.login),
+                      label: const Text('Login to Zettle'),
+                    )
+                  else
+                    ElevatedButton.icon(
+                      onPressed: _logout,
+                      icon: const Icon(Icons.logout),
+                      label: const Text('Logout'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        foregroundColor: Colors.white,
+                      ),
                     ),
+                ] else ...[
+                  // iOS: Login is optional, auth happens automatically during payment
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: _isLoggedIn ? null : _login,
+                          icon: const Icon(Icons.login),
+                          label: const Text('Login (Optional)'),
+                        ),
+                      ),
+                      if (_isLoggedIn) ...[
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: OutlinedButton.icon(
+                            onPressed: _logout,
+                            icon: const Icon(Icons.logout),
+                            label: const Text('Logout'),
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
+                  const SizedBox(height: 4),
+                  const Text(
+                    'iOS: Authentication happens automatically during payment',
+                    style: TextStyle(fontSize: 11, color: Colors.grey),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
               ],
 
               const SizedBox(height: 24),
 
               // Payment Section
-              if (_isLoggedIn) ...[
+              // On iOS, login is optional - auth happens automatically during payment
+              // On Android, explicit login is required
+              if (_isLoggedIn || Platform.isIOS) ...[
                 Text(
                   'Payment',
                   style: Theme.of(context).textTheme.titleLarge,
@@ -276,7 +347,8 @@ class _ZettleExampleState extends State<ZettleExample> {
                   controller: _amountController,
                   decoration: const InputDecoration(
                     labelText: 'Amount (cents)',
-                    hintText: '1000 = \$10.00',
+                    hintText: '100 = €1.00 (minimum)',
+                    helperText: 'Minimum: 100 cents (€1.00)',
                     border: OutlineInputBorder(),
                   ),
                   keyboardType: TextInputType.number,

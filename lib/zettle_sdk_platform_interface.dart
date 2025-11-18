@@ -48,6 +48,13 @@ abstract class ZettleSdkPlatform extends PlatformInterface {
     throw UnimplementedError('isLoggedIn() has not been implemented.');
   }
 
+  /// Stream of authentication state changes
+  ///
+  /// Emits `true` when user is logged in, `false` when logged out
+  Stream<bool> get authStateStream {
+    throw UnimplementedError('authStateStream has not been implemented.');
+  }
+
   /// Process a card payment
   ///
   /// [amount] - Payment amount in cents (e.g., 1000 = $10.00)

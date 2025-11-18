@@ -2,15 +2,34 @@ import Flutter
 import UIKit
 import iZettleSDK
 
-public class ZettleSdkPlugin: NSObject, FlutterPlugin {
+public class ZettleSdkPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
     private var isInitialized = false
     private var clientId: String?
     private var redirectUrl: String?
+    private var authStateEventSink: FlutterEventSink?
 
     public static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(name: "zettle_sdk", binaryMessenger: registrar.messenger())
+        let eventChannel = FlutterEventChannel(name: "zettle_sdk/auth_state", binaryMessenger: registrar.messenger())
         let instance = ZettleSdkPlugin()
         registrar.addMethodCallDelegate(instance, channel: channel)
+        eventChannel.setStreamHandler(instance)
+    }
+
+    // FlutterStreamHandler methods
+    public func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
+        authStateEventSink = events
+        // Send current auth state immediately when stream is listened to
+        if isInitialized {
+            let isAuthenticated = iZettleSDK.shared().isLoggedIn
+            events(isAuthenticated)
+        }
+        return nil
+    }
+
+    public func onCancel(withArguments arguments: Any?) -> FlutterError? {
+        authStateEventSink = nil
+        return nil
     }
 
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
@@ -95,6 +114,11 @@ public class ZettleSdkPlugin: NSObject, FlutterPlugin {
         }
 
         isInitialized = true
+
+        // Notify auth state listeners of current auth state
+        let isAuthenticated = iZettleSDK.shared().isLoggedIn
+        authStateEventSink?(isAuthenticated)
+
         result(nil)
     }
 
@@ -104,10 +128,22 @@ public class ZettleSdkPlugin: NSObject, FlutterPlugin {
             return
         }
 
-        // iOS SDK handles authentication automatically within payment flows
-        // There's no separate login method in the iOS SDK
-        // Return success to maintain API compatibility
-        result(nil)
+        guard let viewController = getRootViewController() else {
+            result(FlutterError(code: "NO_VIEWCONTROLLER", message: "Unable to get view controller", details: nil))
+            return
+        }
+
+        iZettleSDK.shared().performLogin(from: viewController) { error in
+            if let error = error {
+                // Emit false for auth state on login error
+                self.authStateEventSink?(false)
+                result(FlutterError(code: "LOGIN_ERROR", message: error.localizedDescription, details: nil))
+            } else {
+                // Emit true for auth state on successful login
+                self.authStateEventSink?(true)
+                result(nil)
+            }
+        }
     }
 
     private func logout(result: @escaping FlutterResult) {
@@ -115,10 +151,10 @@ public class ZettleSdkPlugin: NSObject, FlutterPlugin {
             result(FlutterError(code: "NOT_INITIALIZED", message: "SDK not initialized. Call initialize() first.", details: nil))
             return
         }
-
-        // iOS SDK doesn't expose a logout method
-        // Authentication is managed automatically by the SDK
-        // Return success to maintain API compatibility
+        
+        iZettleSDK.shared().logout()
+        // Emit false for auth state on successful logout
+        self.authStateEventSink?(false)
         result(nil)
     }
 
@@ -128,9 +164,9 @@ public class ZettleSdkPlugin: NSObject, FlutterPlugin {
             return
         }
 
-        // iOS SDK doesn't expose auth state directly
-        // Return true if initialized, as auth happens automatically
-        result(true)
+        // Check if user is authenticated
+        let isAuthenticated = iZettleSDK.shared().isLoggedIn
+        result(isAuthenticated)
     }
 
     private func charge(call: FlutterMethodCall, result: @escaping FlutterResult) {

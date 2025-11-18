@@ -32,22 +32,46 @@ import com.zettle.sdk.ui.ZettleResult
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
+import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
+import androidx.lifecycle.Observer
 
 class ZettleSdkPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     private lateinit var channel: MethodChannel
+    private lateinit var authStateChannel: EventChannel
     private lateinit var context: Context
     private var activity: Activity? = null
     private var pendingResult: Result? = null
     private var isInitialized = false
+    private var authStateEventSink: EventChannel.EventSink? = null
+    private val authStateObserver = Observer<User.AuthState> { authState ->
+        val isLoggedIn = authState is User.AuthState.LoggedIn
+        authStateEventSink?.success(isLoggedIn)
+    }
 
     override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         context = flutterPluginBinding.applicationContext
         channel = MethodChannel(flutterPluginBinding.binaryMessenger, "zettle_sdk")
         channel.setMethodCallHandler(this)
+
+        authStateChannel = EventChannel(flutterPluginBinding.binaryMessenger, "zettle_sdk/auth_state")
+        authStateChannel.setStreamHandler(object : EventChannel.StreamHandler {
+            override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
+                authStateEventSink = events
+                // Send current state immediately
+                ZettleSDK.instance?.authState?.value?.let { authState ->
+                    val isLoggedIn = authState is User.AuthState.LoggedIn
+                    events?.success(isLoggedIn)
+                }
+            }
+
+            override fun onCancel(arguments: Any?) {
+                authStateEventSink = null
+            }
+        })
     }
 
     override fun onMethodCall(call: MethodCall, result: Result) {
@@ -55,6 +79,7 @@ class ZettleSdkPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             "getPlatformVersion" -> {
                 result.success("Android ${Build.VERSION.RELEASE}")
             }
+
             "initialize" -> initialize(call, result)
             "login" -> login(result)
             "logout" -> logout(result)
@@ -96,6 +121,10 @@ class ZettleSdkPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             val sdk = ZettleSDK.configure(config)
             ProcessLifecycleOwner.get().lifecycle.addObserver(ZettleSDKLifecycle())
             sdk.start()
+
+            // Observe auth state changes
+            sdk.authState.observeForever(authStateObserver)
+
             isInitialized = true
             result.success(null)
         } catch (e: Exception) {
@@ -684,6 +713,8 @@ class ZettleSdkPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
 
     override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
         channel.setMethodCallHandler(null)
+        authStateChannel.setStreamHandler(null)
+        ZettleSDK.instance?.authState?.removeObserver(authStateObserver)
     }
 
     override fun onAttachedToActivity(binding: ActivityPluginBinding) {
