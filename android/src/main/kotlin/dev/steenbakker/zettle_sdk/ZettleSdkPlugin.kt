@@ -93,8 +93,9 @@ class ZettleSdkPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                 addFeature(ManualCardEntryFeature)
             }
 
-            ZettleSDK.configure(config)
+            val sdk = ZettleSDK.configure(config)
             ProcessLifecycleOwner.get().lifecycle.addObserver(ZettleSDKLifecycle())
+            sdk.start()
             isInitialized = true
             result.success(null)
         } catch (e: Exception) {
@@ -174,6 +175,7 @@ class ZettleSdkPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                 parseTippingConfiguration(it)
             }
 
+            // TODO: To receive revenue attribution, specify a unique Build Notation (BN) code as an argument to the function. BN codes track all transactions that originate or are associated with a particular partner. To find your BN code, see Code and Credential Reference.
             val transactionReference = TransactionReference.Builder(reference).build()
 
             pendingResult = result
@@ -183,6 +185,10 @@ class ZettleSdkPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                 amount = amount,
                 tippingConfiguration = tippingConfig,
                 enableInstallments = enableInstallments
+                // OPTIONAL, set payment properties
+
+                // Example: The payee-pricing-tier-id is a code created by Partner managers, SGMs or sales to set pricing tier. This code is included in the Card payments API calls.
+//                readerPaymentProperties = readerPaymentProperties
             ).charge(currentActivity)
 
             currentActivity.startActivityForResult(intent, CHARGE_REQUEST_CODE)
