@@ -77,8 +77,23 @@ public class ZettleSdkPlugin: NSObject, FlutterPlugin {
         self.clientId = clientId
         self.redirectUrl = redirectUrl
 
-        // iOS SDK doesn't require explicit initialization with auth provider
-        // Authentication happens automatically within payment flows
+        guard let callbackURL = URL(string: redirectUrl) else {
+            result(FlutterError(code: "INVALID_REDIRECT_URL", message: "Invalid redirect URL format", details: nil))
+            return
+        }
+
+        do {
+            let authenticationProvider = try iZettleSDKAuthorization(
+                clientID: clientId,
+                callbackURL: callbackURL
+            )
+
+            iZettleSDK.shared().start(with: authenticationProvider)
+        } catch {
+            result(FlutterError(code: "INITIALIZATION_FAILED", message: "Failed to initialize SDK: \(error.localizedDescription)", details: nil))
+            return
+        }
+
         isInitialized = true
         result(nil)
     }
@@ -510,27 +525,19 @@ public class ZettleSdkPlugin: NSObject, FlutterPlugin {
             return
         }
 
-        guard let args = call.arguments as? [String: Any],
-              let settingsType = args["settingsType"] as? String else {
-            result(FlutterError(code: "INVALID_ARGUMENTS", message: "settingsType is required", details: nil))
-            return
-        }
+        // iOS SDK has a unified settings view, unlike Android's separate screens
+        // The settings view includes: account switching, FAQ, card reader settings, and payment method configuration
 
-        // iOS SDK has limited settings screens compared to Android
-        // Most settings are handled within the payment flows themselves
-        switch settingsType {
-        case "cardReader":
-            // Card reader settings are typically accessed through the payment flow
-            result(FlutterError(code: "NOT_AVAILABLE", message: "Card reader settings are managed through the payment flow on iOS", details: nil))
-        case "manualCardEntry":
-            result(FlutterError(code: "NOT_AVAILABLE", message: "Manual card entry settings are not available as a separate screen on iOS", details: nil))
-        case "qrcPayPal", "qrcVenmo":
-            result(FlutterError(code: "NOT_AVAILABLE", message: "QRC settings are not available as a separate screen on iOS", details: nil))
-        case "tipping":
-            result(FlutterError(code: "NOT_AVAILABLE", message: "Tipping settings are configured within the payment flow on iOS", details: nil))
-        default:
-            result(FlutterError(code: "INVALID_SETTINGS_TYPE", message: "Unknown settings type: \(settingsType)", details: nil))
-        }
+        // Enable PayPal Reader tipping settings in the settings view
+        let configuration = IZSDKSettingsConfiguration(paypalReaderTippingSettingsEnabled: true)
+
+        iZettleSDK.shared().presentSettings(
+            from: viewController,
+            configuration: configuration
+        )
+
+        // presentSettings doesn't provide a completion handler, so we return success immediately
+        result(nil)
     }
 
     // Helper Methods

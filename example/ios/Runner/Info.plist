@@ -58,5 +58,20 @@
 			</array>
 		</dict>
 	</array>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Location is required to connect to Zettle card readers via Bluetooth</string>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>Bluetooth is required to connect to Zettle card readers for payment processing</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>Bluetooth is required to connect to Zettle card readers for payment processing</string>
+	<key>UISupportedExternalAccessoryProtocols</key>
+	<array>
+		<string>com.izettle.cardreader-one</string>
+	</array>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>external-accessory</string>
+		<string>bluetooth-central</string>
+	</array>
 </dict>
 </plist>

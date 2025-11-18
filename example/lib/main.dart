@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
+import 'dart:io' show Platform;
 import 'package:zettle_sdk/zettle_sdk.dart';
 
 void main() {
@@ -40,6 +41,7 @@ class _ZettleExampleState extends State<ZettleExample> {
   @override
   void initState() {
     super.initState();
+    _initialize();
   }
 
   Future<void> _initialize() async {
@@ -170,6 +172,19 @@ class _ZettleExampleState extends State<ZettleExample> {
     }
   }
 
+  Future<void> _openSettings(SettingsScreenType settingsType) async {
+    try {
+      await _zettleSdk.openSettings(settingsType);
+      setState(() {
+        _statusMessage = 'Opened $settingsType settings';
+      });
+    } on ZettleException catch (e) {
+      setState(() {
+        _statusMessage = 'Failed to open settings: ${e.message} (${e.code})';
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -179,110 +194,166 @@ class _ZettleExampleState extends State<ZettleExample> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // Status Card
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Status',
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(_statusMessage),
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Icon(
-                          _isLoggedIn ? Icons.check_circle : Icons.cancel,
-                          color: _isLoggedIn ? Colors.green : Colors.red,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(_isLoggedIn ? 'Authenticated' : 'Not authenticated'),
-                      ],
-                    ),
-                  ],
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Status Card
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Status',
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(_statusMessage),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          Icon(
+                            _isLoggedIn ? Icons.check_circle : Icons.cancel,
+                            color: _isLoggedIn ? Colors.green : Colors.red,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(_isLoggedIn ? 'Authenticated' : 'Not authenticated'),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 16),
+              const SizedBox(height: 16),
 
-            // Setup Section
-            if (!_isInitialized) ...[
-              ElevatedButton.icon(
-                onPressed: _initialize,
-                icon: const Icon(Icons.settings),
-                label: const Text('Initialize SDK'),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                'Note: Update the clientId and redirectUrl in the code with your actual credentials from https://developer.zettle.com/',
-                style: TextStyle(fontSize: 12, color: Colors.grey),
-              ),
-            ],
+              // Setup Section
+              if (!_isInitialized) ...[
+                ElevatedButton.icon(
+                  onPressed: _initialize,
+                  icon: const Icon(Icons.settings),
+                  label: const Text('Initialize SDK'),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Note: Update the clientId and redirectUrl in the code with your actual credentials from https://developer.zettle.com/',
+                  style: TextStyle(fontSize: 12, color: Colors.grey),
+                ),
+              ],
 
-            // Authentication Section
-            if (_isInitialized) ...[
-              if (!_isLoggedIn)
+              // Authentication Section
+              if (_isInitialized) ...[
+                if (!_isLoggedIn)
+                  ElevatedButton.icon(
+                    onPressed: _login,
+                    icon: const Icon(Icons.login),
+                    label: const Text('Login to Zettle'),
+                  )
+                else
+                  ElevatedButton.icon(
+                    onPressed: _logout,
+                    icon: const Icon(Icons.logout),
+                    label: const Text('Logout'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      foregroundColor: Colors.white,
+                    ),
+                  ),
+              ],
+
+              const SizedBox(height: 24),
+
+              // Payment Section
+              if (_isLoggedIn) ...[
+                Text(
+                  'Payment',
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: _amountController,
+                  decoration: const InputDecoration(
+                    labelText: 'Amount (cents)',
+                    hintText: '1000 = \$10.00',
+                    border: OutlineInputBorder(),
+                  ),
+                  keyboardType: TextInputType.number,
+                ),
+                const SizedBox(height: 8),
                 ElevatedButton.icon(
-                  onPressed: _login,
-                  icon: const Icon(Icons.login),
-                  label: const Text('Login to Zettle'),
-                )
-              else
-                ElevatedButton.icon(
-                  onPressed: _logout,
-                  icon: const Icon(Icons.logout),
-                  label: const Text('Logout'),
+                  onPressed: _processPayment,
+                  icon: const Icon(Icons.payment),
+                  label: const Text('Process Payment'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red,
+                    backgroundColor: Colors.green,
                     foregroundColor: Colors.white,
                   ),
                 ),
-            ],
+                const SizedBox(height: 8),
+                if (_lastPaymentReference != null)
+                  OutlinedButton.icon(
+                    onPressed: _refundLastPayment,
+                    icon: const Icon(Icons.replay),
+                    label: const Text('Refund Last Payment'),
+                  ),
 
-            const SizedBox(height: 24),
+                const SizedBox(height: 24),
 
-            // Payment Section
-            if (_isLoggedIn) ...[
-              Text(
-                'Payment',
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-              const SizedBox(height: 8),
-              TextField(
-                controller: _amountController,
-                decoration: const InputDecoration(
-                  labelText: 'Amount (cents)',
-                  hintText: '1000 = \$10.00',
-                  border: OutlineInputBorder(),
+                // Settings Section
+                Text(
+                  'Settings',
+                  style: Theme.of(context).textTheme.titleLarge,
                 ),
-                keyboardType: TextInputType.number,
-              ),
-              const SizedBox(height: 8),
-              ElevatedButton.icon(
-                onPressed: _processPayment,
-                icon: const Icon(Icons.payment),
-                label: const Text('Process Payment'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                  foregroundColor: Colors.white,
-                ),
-              ),
-              const SizedBox(height: 8),
-              if (_lastPaymentReference != null)
-                OutlinedButton.icon(
-                  onPressed: _refundLastPayment,
-                  icon: const Icon(Icons.replay),
-                  label: const Text('Refund Last Payment'),
-                ),
+                const SizedBox(height: 8),
+                // iOS: Unified settings view
+                // Android: Separate settings screens
+                if (Platform.isIOS)
+                  ElevatedButton.icon(
+                    onPressed: () => _openSettings(SettingsScreenType.cardReader),
+                    icon: const Icon(Icons.settings),
+                    label: const Text('Open Settings'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      foregroundColor: Colors.white,
+                    ),
+                  )
+                else
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      ElevatedButton.icon(
+                        onPressed: () => _openSettings(SettingsScreenType.cardReader),
+                        icon: const Icon(Icons.credit_card),
+                        label: const Text('Card Reader'),
+                      ),
+                      ElevatedButton.icon(
+                        onPressed: () => _openSettings(SettingsScreenType.manualCardEntry),
+                        icon: const Icon(Icons.keyboard),
+                        label: const Text('Manual Entry'),
+                      ),
+                      ElevatedButton.icon(
+                        onPressed: () => _openSettings(SettingsScreenType.qrcPayPal),
+                        icon: const Icon(Icons.qr_code),
+                        label: const Text('PayPal QRC'),
+                      ),
+                      ElevatedButton.icon(
+                        onPressed: () => _openSettings(SettingsScreenType.qrcVenmo),
+                        icon: const Icon(Icons.qr_code_scanner),
+                        label: const Text('Venmo QRC'),
+                      ),
+                      ElevatedButton.icon(
+                        onPressed: () => _openSettings(SettingsScreenType.tipping),
+                        icon: const Icon(Icons.attach_money),
+                        label: const Text('Tipping'),
+                      ),
+                    ],
+                  ),
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );
