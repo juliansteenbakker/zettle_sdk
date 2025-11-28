@@ -1,4 +1,4 @@
-library zettle_sdk;
+library;
 
 export 'models.dart';
 

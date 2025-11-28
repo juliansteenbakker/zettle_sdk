@@ -695,23 +695,23 @@ Some features have platform-specific availability:
 
 ### Current Implementation Status
 
-| Feature | Android | iOS | Status |
-|---------|---------|-----|--------|
-| Authentication | ✅ | ✅ | Complete |
-| Card Reader Payments | ✅ | ✅ | Complete |
-| Card Reader Refunds | ✅ | ✅ | Complete |
-| QRC Payments (PayPal/Venmo) | ✅ | ✅ | Complete |
-| QRC Refunds | ✅ | ✅ | Complete |
-| Manual Card Entry Payments | ✅ | ✅ | Complete |
-| Manual Card Entry Refunds | ✅ | ✅ | Complete |
-| Tipping Configuration | ✅ | ✅ | Complete |
-| Installments | ✅ | N/A | Complete (Android only) |
-| Settings Screens | ✅ | ✅ | Complete (unified view on iOS) |
-| Retrieve Card Payment | ⚠️ | ✅ | iOS only |
-| Retrieve MCE Payment | ❌ | ✅ | iOS only |
-| Retrieve QRC Payment | ❌ | ❌ | Not implemented |
-| Transaction Metadata | ❌ | N/A | Not implemented |
-| Auth State Stream | ❌ | ❌ | Not implemented |
+| Feature                     | Android | iOS | Status                         |
+|-----------------------------|---------|-----|--------------------------------|
+| Authentication              | ✅       | ✅   | Complete                       |
+| Card Reader Payments        | ✅       | ✅   | Complete                       |
+| Card Reader Refunds         | ✅       | ✅   | Complete                       |
+| QRC Payments (PayPal/Venmo) | ✅       | ✅   | Complete                       |
+| QRC Refunds                 | ✅       | ✅   | Complete                       |
+| Manual Card Entry Payments  | ✅       | ✅   | Complete                       |
+| Manual Card Entry Refunds   | ✅       | ✅   | Complete                       |
+| Tipping Configuration       | ✅       | ✅   | Complete                       |
+| Installments                | ✅       | N/A | Complete (Android only)        |
+| Settings Screens            | ✅       | ✅   | Complete (unified view on iOS) |
+| Retrieve Card Payment       | ⚠️      | ✅   | iOS only                       |
+| Retrieve MCE Payment        | ❌       | ✅   | iOS only                       |
+| Retrieve QRC Payment        | ❌       | ❌   | Not implemented                |
+| Transaction Metadata        | ❌       | N/A | Not implemented                |
+| Auth State Stream           | ❌       | ❌   | Not implemented                |
 
 ### Contributing
 

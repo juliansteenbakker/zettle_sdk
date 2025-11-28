@@ -1,4 +1,5 @@
 /// Zettle SDK Models
+library;
 
 /// Result of a payment operation
 class PaymentResult {
