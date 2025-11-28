@@ -651,14 +651,11 @@ TransactionReference.Builder(reference)
   .put("CUSTOMER_ID", "customer-789")
   .build()
 ```
-**Complexity:** Medium | **Estimated effort:** 3 hours
 
 #### Enhanced Retrieve Implementation
 Currently `retrievePaymentInfo()`, `retrieveQRCPaymentInfo()`, and `retrieveManualCardEntryInfo()` have limited implementations:
 - **Android:** Card reader retrieve not implemented; QRC and MCE retrieves not implemented
 - **iOS:** Card reader retrieve implemented; MCE retrieve implemented; QRC not implemented
-
-**Complexity:** Medium | **Estimated effort:** 5 hours
 
 ### Phase 3 - Advanced Features 🟢
 
@@ -674,12 +671,9 @@ zettleSdk.authStateStream.listen((authState) {
   }
 });
 ```
-**Complexity:** Medium | **Estimated effort:** 6 hours
 
 #### Custom Timeout Configuration
 Allow developers to configure payment timeout durations.
-
-**Complexity:** Low | **Estimated effort:** 2 hours
 
 ### Platform-Specific Limitations
 
@@ -731,7 +725,7 @@ Priority features for contribution:
 
 ## License
 
-This plugin is provided as-is. Please refer to the Zettle SDK license terms for the underlying SDKs.
+This project is licensed under the BSD 3 License. See the [LICENSE](LICENSE) file for details.
 
 ## Contributing
 
