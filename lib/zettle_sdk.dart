@@ -2,6 +2,8 @@ library;
 
 export 'models.dart';
 
+import 'dart:io' show Platform;
+
 import 'zettle_sdk_platform_interface.dart';
 import 'models.dart';
 
@@ -25,6 +27,12 @@ class ZettleSdk {
   /// ));
   /// ```
   Future<void> initialize(ZettleConfig config) {
+    if (!Platform.isAndroid && !Platform.isIOS) {
+      throw ZettleException(
+        code: 'UNSUPPORTED_PLATFORM',
+        message: 'Zettle SDK only supports Android and iOS platforms',
+      );
+    }
     return ZettleSdkPlatform.instance.initialize(config);
   }
 
