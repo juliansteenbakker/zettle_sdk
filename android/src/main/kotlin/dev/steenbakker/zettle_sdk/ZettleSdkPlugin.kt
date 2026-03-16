@@ -38,6 +38,7 @@ import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 import androidx.lifecycle.Observer
+import com.zettle.sdk.ui.zettleResult
 
 class ZettleSdkPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     private lateinit var channel: MethodChannel
@@ -537,7 +538,7 @@ class ZettleSdkPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
 
     private fun handleChargeResult(data: Intent, result: Result) {
         try {
-            when (val zettleResult = data.getParcelableCompat<ZettleResult>("ZETTLE_RESULT")) {
+            when (val zettleResult = data.zettleResult()) {
                 is ZettleResult.Completed<*> -> {
                     val payment: CardPaymentResult.Completed = CardReaderAction.fromPaymentResult(zettleResult)
                     val payload = payment.payload
@@ -565,7 +566,7 @@ class ZettleSdkPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
 
     private fun handleRefundResult(data: Intent, result: Result) {
         try {
-            when (val zettleResult = data.getParcelableCompat<ZettleResult>("ZETTLE_RESULT")) {
+            when (val zettleResult = data.zettleResult()) {
                 is ZettleResult.Completed<*> -> {
                     val refund: RefundResult.Completed = CardReaderAction.fromRefundResult(zettleResult)
                     val payload = refund.payload
@@ -592,7 +593,7 @@ class ZettleSdkPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
 
     private fun handleQRCChargeResult(data: Intent, result: Result) {
         try {
-            when (val zettleResult = data.getParcelableCompat<ZettleResult>("ZETTLE_RESULT")) {
+            when (val zettleResult = data.zettleResult()) {
                 is ZettleResult.Completed<*> -> {
                     val payment = QrcAction.fromPaymentResult(zettleResult)
 
@@ -620,7 +621,7 @@ class ZettleSdkPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
 
     private fun handleQRCRefundResult(data: Intent, result: Result) {
         try {
-            when (val zettleResult = data.getParcelableCompat<ZettleResult>("ZETTLE_RESULT")) {
+            when (val zettleResult = data.zettleResult()) {
                 is ZettleResult.Completed<*> -> {
                     val refund = QrcAction.fromRefundResult(zettleResult)
 
@@ -648,7 +649,7 @@ class ZettleSdkPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
 
     private fun handleMCEChargeResult(data: Intent, result: Result) {
         try {
-            when (val zettleResult = data.getParcelableCompat<ZettleResult>("ZETTLE_RESULT")) {
+            when (val zettleResult = data.zettleResult()) {
                 is ZettleResult.Completed<*> -> {
                     val payment = ManualCardEntryAction.fromPaymentResult(zettleResult)
 
@@ -675,7 +676,7 @@ class ZettleSdkPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
 
     private fun handleMCERefundResult(data: Intent, result: Result) {
         try {
-            when (val zettleResult = data.getParcelableCompat<ZettleResult>("ZETTLE_RESULT")) {
+            when (val zettleResult = data.zettleResult()) {
                 is ZettleResult.Completed<*> -> {
                     val refund = ManualCardEntryAction.fromRefundResult(zettleResult)
 
