@@ -1,14 +1,14 @@
 # zettle_sdk
 
-A Flutter plugin for integrating Zettle (iZettle) payment processing into your Flutter applications on Android and iOS.
+A Flutter plugin for integrating Zettle by PayPal (formerly iZettle, upcoming: PayPal Point of Sale) payment processing into your Flutter applications on Android and iOS.
 
 ## Features
 
-- 🔐 **Authentication**: Log in and out of Zettle accounts
-- 💳 **Card Payments**: Process card payments with Zettle card readers
-- 💰 **Refunds**: Refund previous payments (full or partial)
-- 📊 **Payment Info**: Retrieve payment information by reference
-- 🎁 **Tipping**: Support for tipping on both Zettle and PayPal readers
+-  **Authentication**: Log in and out of Zettle accounts
+-  **Card Payments**: Process card payments with Zettle card readers
+-  **Refunds**: Refund previous payments (full or partial)
+-  **Payment Info**: Retrieve payment information by reference
+-  **Tipping**: Support for tipping on both Zettle and PayPal readers
 
 ## Prerequisites
 
@@ -635,77 +635,6 @@ ZettleConfig(
   isDevMode: true,  // Uses Zettle test environment
 )
 ```
-
-## Feature Roadmap / TODO
-
-This plugin currently implements **~85% of the native SDK functionality**. Below are features from the native SDKs that are not yet implemented:
-
-### Phase 2 - Enhancement Features 🟡
-
-#### Transaction Metadata (Android Only)
-Add custom key-value pairs to transactions for tracking and analytics:
-```dart
-// Not yet implemented
-TransactionReference.Builder(reference)
-  .put("ORDER_ID", "12345")
-  .put("CUSTOMER_ID", "customer-789")
-  .build()
-```
-
-#### Enhanced Retrieve Implementation
-Currently `retrievePaymentInfo()`, `retrieveQRCPaymentInfo()`, and `retrieveManualCardEntryInfo()` have limited implementations:
-- **Android:** Card reader retrieve not implemented; QRC and MCE retrieves not implemented
-- **iOS:** Card reader retrieve implemented; MCE retrieve implemented; QRC not implemented
-
-### Phase 3 - Advanced Features 🟢
-
-#### Auth State Observation
-Real-time authentication state changes via streams instead of polling:
-```dart
-// Not yet implemented
-zettleSdk.authStateStream.listen((authState) {
-  if (authState == AuthState.loggedIn) {
-    // Handle logged in
-  } else {
-    // Handle logged out
-  }
-});
-```
-
-#### Custom Timeout Configuration
-Allow developers to configure payment timeout durations.
-
-### Platform-Specific Limitations
-
-#### Settings Screen Differences
-- **Android**: Provides separate settings screens for different features (card reader, manual entry, QRC, tipping)
-- **iOS**: Provides a unified settings view that includes all settings in one screen
-
-#### Android vs iOS Feature Parity
-Some features have platform-specific availability:
-- **Installments:** Android only (not available in iOS SDK)
-- **Separate Settings Screens:** Android only (iOS has unified settings view)
-- **BN Code (Manual Card Entry):** Android only
-
-### Current Implementation Status
-
-| Feature                     | Android | iOS | Status                         |
-|-----------------------------|---------|-----|--------------------------------|
-| Authentication              | ✅       | ✅   | Complete                       |
-| Card Reader Payments        | ✅       | ✅   | Complete                       |
-| Card Reader Refunds         | ✅       | ✅   | Complete                       |
-| QRC Payments (PayPal/Venmo) | ✅       | ✅   | Complete                       |
-| QRC Refunds                 | ✅       | ✅   | Complete                       |
-| Manual Card Entry Payments  | ✅       | ✅   | Complete                       |
-| Manual Card Entry Refunds   | ✅       | ✅   | Complete                       |
-| Tipping Configuration       | ✅       | ✅   | Complete                       |
-| Installments                | ✅       | N/A | Complete (Android only)        |
-| Settings Screens            | ✅       | ✅   | Complete (unified view on iOS) |
-| Retrieve Card Payment       | ⚠️      | ✅   | iOS only                       |
-| Retrieve MCE Payment        | ❌       | ✅   | iOS only                       |
-| Retrieve QRC Payment        | ❌       | ❌   | Not implemented                |
-| Transaction Metadata        | ❌       | N/A | Not implemented                |
-| Auth State Stream           | ❌       | ❌   | Not implemented                |
 
 ### Contributing
 
