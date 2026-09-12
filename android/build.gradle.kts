@@ -80,7 +80,7 @@ if (extensions.findByName("kotlin") != null) {
 
 dependencies {
     // Zettle SDK dependencies
-    val zettleVersion = "2.38.2"
+    val zettleVersion = "2.52.1"
     implementation("com.zettle.sdk:core:$zettleVersion")
     implementation("com.zettle.sdk.feature.cardreader:ui:$zettleVersion")
 
