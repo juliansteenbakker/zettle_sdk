@@ -19,8 +19,8 @@ class MethodChannelZettleSdk extends ZettleSdkPlatform {
   @override
   Stream<bool> get authStateStream {
     _authStateStream ??= authStateChannel.receiveBroadcastStream().map(
-      (event) => event as bool,
-    );
+          (event) => event as bool,
+        );
     return _authStateStream!;
   }
 
