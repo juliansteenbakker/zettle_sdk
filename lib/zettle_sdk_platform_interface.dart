@@ -128,7 +128,9 @@ abstract class ZettleSdkPlatform extends PlatformInterface {
     String referenceId,
     QRCPaymentType paymentType,
   ) {
-    throw UnimplementedError('retrieveQRCPaymentInfo() has not been implemented.');
+    throw UnimplementedError(
+      'retrieveQRCPaymentInfo() has not been implemented.',
+    );
   }
 
   // Manual Card Entry Methods
@@ -143,7 +145,9 @@ abstract class ZettleSdkPlatform extends PlatformInterface {
     required String reference,
     String? bnCode,
   }) {
-    throw UnimplementedError('chargeManualCardEntry() has not been implemented.');
+    throw UnimplementedError(
+      'chargeManualCardEntry() has not been implemented.',
+    );
   }
 
   /// Refund a manual card entry payment
@@ -156,14 +160,20 @@ abstract class ZettleSdkPlatform extends PlatformInterface {
     required String paymentReferenceId,
     required String refundReference,
   }) {
-    throw UnimplementedError('refundManualCardEntry() has not been implemented.');
+    throw UnimplementedError(
+      'refundManualCardEntry() has not been implemented.',
+    );
   }
 
   /// Retrieve manual card entry payment information
   ///
   /// [referenceId] - Reference ID of the payment to retrieve
-  Future<ManualCardEntryResult> retrieveManualCardEntryInfo(String referenceId) {
-    throw UnimplementedError('retrieveManualCardEntryInfo() has not been implemented.');
+  Future<ManualCardEntryResult> retrieveManualCardEntryInfo(
+    String referenceId,
+  ) {
+    throw UnimplementedError(
+      'retrieveManualCardEntryInfo() has not been implemented.',
+    );
   }
 
   // Settings Methods

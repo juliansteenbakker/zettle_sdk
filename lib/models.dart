@@ -95,28 +95,17 @@ class ZettleException implements Exception {
   final String message;
   final dynamic details;
 
-  ZettleException({
-    required this.code,
-    required this.message,
-    this.details,
-  });
+  ZettleException({required this.code, required this.message, this.details});
 
   @override
   String toString() => 'ZettleException($code): $message';
 }
 
 /// Tipping style for Zettle readers
-enum ZettleReaderTippingStyle {
-  none,
-  amount,
-  percentage,
-}
+enum ZettleReaderTippingStyle { none, amount, percentage }
 
 /// Tipping style for PayPal readers
-enum PayPalReaderTippingStyle {
-  none,
-  predefinedPercentage,
-}
+enum PayPalReaderTippingStyle { none, predefinedPercentage }
 
 /// Tipping configuration
 class TippingConfiguration {
@@ -161,10 +150,7 @@ class ZettleConfig {
 }
 
 /// QR Code payment type
-enum QRCPaymentType {
-  paypal,
-  venmo,
-}
+enum QRCPaymentType { paypal, venmo }
 
 /// Result of a QRC payment operation
 class QRCPaymentResult {

@@ -292,7 +292,9 @@ class ZettleSdk {
   ///
   /// Returns [ManualCardEntryResult] with payment details.
   /// Throws [ZettleException] if payment not found.
-  Future<ManualCardEntryResult> retrieveManualCardEntryInfo(String referenceId) {
+  Future<ManualCardEntryResult> retrieveManualCardEntryInfo(
+    String referenceId,
+  ) {
     return ZettleSdkPlatform.instance.retrieveManualCardEntryInfo(referenceId);
   }
 

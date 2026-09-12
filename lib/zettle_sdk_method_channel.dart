@@ -18,15 +18,17 @@ class MethodChannelZettleSdk extends ZettleSdkPlatform {
 
   @override
   Stream<bool> get authStateStream {
-    _authStateStream ??= authStateChannel
-        .receiveBroadcastStream()
-        .map((event) => event as bool);
+    _authStateStream ??= authStateChannel.receiveBroadcastStream().map(
+      (event) => event as bool,
+    );
     return _authStateStream!;
   }
 
   @override
   Future<String?> getPlatformVersion() async {
-    final version = await methodChannel.invokeMethod<String>('getPlatformVersion');
+    final version = await methodChannel.invokeMethod<String>(
+      'getPlatformVersion',
+    );
     return version;
   }
 
@@ -148,9 +150,10 @@ class MethodChannelZettleSdk extends ZettleSdkPlatform {
   @override
   Future<PaymentResult> retrievePaymentInfo(String referenceId) async {
     try {
-      final result = await methodChannel.invokeMethod<Map>('retrievePaymentInfo', {
-        'referenceId': referenceId,
-      });
+      final result = await methodChannel.invokeMethod<Map>(
+        'retrievePaymentInfo',
+        {'referenceId': referenceId},
+      );
 
       if (result == null) {
         throw ZettleException(
@@ -239,10 +242,10 @@ class MethodChannelZettleSdk extends ZettleSdkPlatform {
     QRCPaymentType paymentType,
   ) async {
     try {
-      final result = await methodChannel.invokeMethod<Map>('retrieveQRCPaymentInfo', {
-        'referenceId': referenceId,
-        'paymentType': paymentType.name,
-      });
+      final result = await methodChannel.invokeMethod<Map>(
+        'retrieveQRCPaymentInfo',
+        {'referenceId': referenceId, 'paymentType': paymentType.name},
+      );
 
       if (result == null) {
         throw ZettleException(
@@ -270,11 +273,10 @@ class MethodChannelZettleSdk extends ZettleSdkPlatform {
     String? bnCode,
   }) async {
     try {
-      final result = await methodChannel.invokeMethod<Map>('chargeManualCardEntry', {
-        'amount': amount,
-        'reference': reference,
-        'bnCode': bnCode,
-      });
+      final result = await methodChannel.invokeMethod<Map>(
+        'chargeManualCardEntry',
+        {'amount': amount, 'reference': reference, 'bnCode': bnCode},
+      );
 
       if (result == null) {
         throw ZettleException(
@@ -300,11 +302,14 @@ class MethodChannelZettleSdk extends ZettleSdkPlatform {
     required String refundReference,
   }) async {
     try {
-      final result = await methodChannel.invokeMethod<Map>('refundManualCardEntry', {
-        'amount': amount,
-        'paymentReferenceId': paymentReferenceId,
-        'refundReference': refundReference,
-      });
+      final result = await methodChannel.invokeMethod<Map>(
+        'refundManualCardEntry',
+        {
+          'amount': amount,
+          'paymentReferenceId': paymentReferenceId,
+          'refundReference': refundReference,
+        },
+      );
 
       if (result == null) {
         throw ZettleException(
@@ -313,7 +318,9 @@ class MethodChannelZettleSdk extends ZettleSdkPlatform {
         );
       }
 
-      return ManualCardEntryRefundResult.fromMap(Map<String, dynamic>.from(result));
+      return ManualCardEntryRefundResult.fromMap(
+        Map<String, dynamic>.from(result),
+      );
     } on PlatformException catch (e) {
       throw ZettleException(
         code: e.code,
@@ -324,11 +331,14 @@ class MethodChannelZettleSdk extends ZettleSdkPlatform {
   }
 
   @override
-  Future<ManualCardEntryResult> retrieveManualCardEntryInfo(String referenceId) async {
+  Future<ManualCardEntryResult> retrieveManualCardEntryInfo(
+    String referenceId,
+  ) async {
     try {
-      final result = await methodChannel.invokeMethod<Map>('retrieveManualCardEntryInfo', {
-        'referenceId': referenceId,
-      });
+      final result = await methodChannel.invokeMethod<Map>(
+        'retrieveManualCardEntryInfo',
+        {'referenceId': referenceId},
+      );
 
       if (result == null) {
         throw ZettleException(
