@@ -97,5 +97,5 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-process:2.8.7")
 
     testImplementation("org.jetbrains.kotlin:kotlin-test")
-    testImplementation("org.mockito:mockito-core:5.0.0")
+    testImplementation("org.mockito:mockito-core:5.23.0")
 }
