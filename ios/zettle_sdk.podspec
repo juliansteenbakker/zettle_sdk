@@ -4,7 +4,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'zettle_sdk'
-  s.version          = '0.0.1'
+  s.version          = '1.0.0' # x-release-please-version
   s.summary          = 'A flutter plugin for the zettle android and ios sdk'
   s.description      = <<-DESC
 A flutter plugin for the zettle android and ios sdk
