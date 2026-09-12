@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: PayPal/Zettle Developer Portal
+    url: https://developer.zettle.com
+    about: For application setup, Client ID/OAuth configuration, and questions about the underlying PayPal Point of Sale (Zettle) API itself.

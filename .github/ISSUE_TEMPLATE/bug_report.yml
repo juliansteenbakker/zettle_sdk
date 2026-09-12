@@ -1,0 +1,88 @@
+name: Bug report
+description: Report a problem with zettle_sdk
+labels: [bug]
+body:
+  - type: checkboxes
+    attributes:
+      label: Is there an existing issue for this?
+      description: Please search existing issues (open and closed) before filing a new one.
+      options:
+        - label: I have searched the existing issues
+          required: true
+
+  - type: checkboxes
+    attributes:
+      label: Have you checked the upstream SDK?
+      description: |
+        This plugin is a wrapper around PayPal/Zettle's own Android and iOS SDKs. If the problem happens during login, card reader pairing, or a payment/refund flow itself (rather than in this plugin's Dart API), the cause is often upstream in the native SDK.
+      options:
+        - label: The problem still occurs with the example app in this repository
+          required: false
+        - label: I have confirmed the app/Client ID is configured correctly in the PayPal/Zettle developer portal
+          required: false
+
+  - type: input
+    attributes:
+      label: zettle_sdk version
+      placeholder: e.g. 1.0.0
+    validations:
+      required: true
+
+  - type: dropdown
+    attributes:
+      label: Platform
+      multiple: true
+      options:
+        - Android
+        - iOS
+    validations:
+      required: true
+
+  - type: input
+    attributes:
+      label: Device and OS version
+      description: The phone/tablet running the app.
+      placeholder: e.g. Pixel 8, Android 15
+    validations:
+      required: true
+
+  - type: input
+    attributes:
+      label: Card reader model
+      description: If the issue involves a card reader payment or refund.
+      placeholder: e.g. Zettle Reader 2, PayPal Card Reader
+
+  - type: textarea
+    attributes:
+      label: Flutter doctor output
+      description: Output of `flutter doctor -v`.
+      render: text
+
+  - type: textarea
+    attributes:
+      label: What happened?
+      description: A clear description of the bug, and what you expected to happen instead.
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Steps to reproduce
+      description: |
+        Minimal steps to reproduce the behavior. A minimal reproducible sample project or code snippet is very helpful.
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Relevant code
+      description: |
+        The API calls involved (login, payment, refund, tipping/settings configuration, etc). Please redact nothing that affects the request, but do redact any real Client ID, access tokens, or account details.
+      render: dart
+
+  - type: textarea
+    attributes:
+      label: Logs
+      description: |
+        Relevant logs, stack traces, or crash reports. Native logs are the most useful ones here: `adb logcat` on Android, or the Xcode/Console output on iOS.
+      render: text

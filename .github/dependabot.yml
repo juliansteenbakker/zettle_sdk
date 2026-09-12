@@ -1,0 +1,83 @@
+version: 2
+
+# Applies to every ecosystem below.
+#
+# A "<type>(scope): ..." prefix is required, otherwise semantic-pr.yml rejects
+# Dependabot's default "Bump x from y to z" titles.
+#
+# Ecosystems that ship to plugin consumers (the plugin's own Android/pub
+# dependencies) use "deps", which release-please renders under a "Dependencies"
+# changelog heading. Dev-only ecosystems (CI actions, the example app) use
+# "chore" so they stay out of the changelog. Reviewers are not listed: CODEOWNERS
+# already requests review on everything, and the key is deprecated.
+#
+# The cooldown lets a release settle before it is proposed, so that a version
+# superseded within days never costs a PR. Security updates ignore it.
+#
+# The iOS side pins iZettleSDK via CocoaPods only (ios/zettle_sdk.podspec).
+# Dependabot has no CocoaPods support, so that pin has to be bumped by hand;
+# there is no second file to cross-check it against.
+
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+    commit-message:
+      prefix: chore
+      include: scope
+
+  - package-ecosystem: gradle
+    directory: /android
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    commit-message:
+      prefix: deps
+
+  - package-ecosystem: gradle
+    directory: /example/android
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    groups:
+      example-android:
+        patterns:
+          - "*"
+    commit-message:
+      prefix: chore
+      include: scope
+
+  # prefix-development keeps a bump of a dev_dependency, which no consumer of
+  # the package resolves, out of the "Dependencies" changelog section.
+  - package-ecosystem: pub
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    commit-message:
+      prefix: deps
+      prefix-development: chore
+
+  - package-ecosystem: pub
+    directory: /example
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    groups:
+      example-dart:
+        patterns:
+          - "*"
+    commit-message:
+      prefix: chore
+      include: scope

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+
 import 'dart:async';
 import 'dart:io' show Platform;
+
 import 'package:zettle_sdk/zettle_sdk.dart';
 
 void main() {
@@ -14,10 +16,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Zettle SDK Example',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        useMaterial3: true,
-      ),
+      theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: true),
       home: const ZettleExample(),
     );
   }
@@ -36,7 +35,9 @@ class _ZettleExampleState extends State<ZettleExample> {
   bool _isLoggedIn = false;
   String _statusMessage = 'Not initialized';
   String? _lastPaymentReference;
-  final _amountController = TextEditingController(text: '100'); // 1 euro minimum
+  final _amountController = TextEditingController(
+    text: '100',
+  ); // 1 euro minimum
 
   @override
   void initState() {
@@ -59,11 +60,13 @@ class _ZettleExampleState extends State<ZettleExample> {
       // TODO: Replace YOUR_CLIENT_ID with your actual Zettle Client ID
       // You can get this from https://developer.zettle.com/
       // The redirectUrl must match the deep link configured in AndroidManifest.xml and Info.plist
-      await _zettleSdk.initialize(ZettleConfig(
-        clientId: 'YOUR_CLIENT_ID',
-        redirectUrl: 'zettleexample://zettle/callback',
-        isDevMode: false, // Set to false for production
-      ));
+      await _zettleSdk.initialize(
+        ZettleConfig(
+          clientId: 'YOUR_CLIENT_ID',
+          redirectUrl: 'zettleexample://zettle/callback',
+          isDevMode: false, // Set to false for production
+        ),
+      );
 
       setState(() {
         _isInitialized = true;
@@ -158,7 +161,8 @@ class _ZettleExampleState extends State<ZettleExample> {
 
       setState(() {
         _lastPaymentReference = result.referenceId;
-        _statusMessage = 'Payment successful!\n'
+        _statusMessage =
+            'Payment successful!\n'
             'Reference: ${result.referenceId}\n'
             'Amount: €${(result.amount / 100).toStringAsFixed(2)}\n'
             'Card: ${result.cardBrand ?? 'Unknown'}';
@@ -190,7 +194,8 @@ class _ZettleExampleState extends State<ZettleExample> {
       );
 
       setState(() {
-        _statusMessage = 'Refund successful!\n'
+        _statusMessage =
+            'Refund successful!\n'
             'Refunded: €${(result.refundedAmount / 100).toStringAsFixed(2)}';
       });
     } on ZettleException catch (e) {
@@ -249,7 +254,11 @@ class _ZettleExampleState extends State<ZettleExample> {
                           ),
                           const SizedBox(width: 8),
                           Expanded(
-                            child: Text(_isLoggedIn ? 'Authenticated' : 'Not authenticated'),
+                            child: Text(
+                              _isLoggedIn
+                                  ? 'Authenticated'
+                                  : 'Not authenticated',
+                            ),
                           ),
                           if (_isInitialized)
                             IconButton(
@@ -338,10 +347,7 @@ class _ZettleExampleState extends State<ZettleExample> {
               // On iOS, login is optional - auth happens automatically during payment
               // On Android, explicit login is required
               if (_isLoggedIn || Platform.isIOS) ...[
-                Text(
-                  'Payment',
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
+                Text('Payment', style: Theme.of(context).textTheme.titleLarge),
                 const SizedBox(height: 8),
                 TextField(
                   controller: _amountController,
@@ -374,16 +380,14 @@ class _ZettleExampleState extends State<ZettleExample> {
                 const SizedBox(height: 24),
 
                 // Settings Section
-                Text(
-                  'Settings',
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
+                Text('Settings', style: Theme.of(context).textTheme.titleLarge),
                 const SizedBox(height: 8),
                 // iOS: Unified settings view
                 // Android: Separate settings screens
                 if (Platform.isIOS)
                   ElevatedButton.icon(
-                    onPressed: () => _openSettings(SettingsScreenType.cardReader),
+                    onPressed: () =>
+                        _openSettings(SettingsScreenType.cardReader),
                     icon: const Icon(Icons.settings),
                     label: const Text('Open Settings'),
                     style: ElevatedButton.styleFrom(
@@ -397,27 +401,32 @@ class _ZettleExampleState extends State<ZettleExample> {
                     runSpacing: 8,
                     children: [
                       ElevatedButton.icon(
-                        onPressed: () => _openSettings(SettingsScreenType.cardReader),
+                        onPressed: () =>
+                            _openSettings(SettingsScreenType.cardReader),
                         icon: const Icon(Icons.credit_card),
                         label: const Text('Card Reader'),
                       ),
                       ElevatedButton.icon(
-                        onPressed: () => _openSettings(SettingsScreenType.manualCardEntry),
+                        onPressed: () =>
+                            _openSettings(SettingsScreenType.manualCardEntry),
                         icon: const Icon(Icons.keyboard),
                         label: const Text('Manual Entry'),
                       ),
                       ElevatedButton.icon(
-                        onPressed: () => _openSettings(SettingsScreenType.qrcPayPal),
+                        onPressed: () =>
+                            _openSettings(SettingsScreenType.qrcPayPal),
                         icon: const Icon(Icons.qr_code),
                         label: const Text('PayPal QRC'),
                       ),
                       ElevatedButton.icon(
-                        onPressed: () => _openSettings(SettingsScreenType.qrcVenmo),
+                        onPressed: () =>
+                            _openSettings(SettingsScreenType.qrcVenmo),
                         icon: const Icon(Icons.qr_code_scanner),
                         label: const Text('Venmo QRC'),
                       ),
                       ElevatedButton.icon(
-                        onPressed: () => _openSettings(SettingsScreenType.tipping),
+                        onPressed: () =>
+                            _openSettings(SettingsScreenType.tipping),
                         icon: const Icon(Icons.attach_money),
                         label: const Text('Tipping'),
                       ),

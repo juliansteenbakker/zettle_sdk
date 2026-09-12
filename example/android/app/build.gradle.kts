@@ -1,8 +1,24 @@
 plugins {
     id("com.android.application")
-    id("kotlin-android")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
+}
+
+// The Flutter Gradle Plugin adds its own project-level repository (for engine
+// artifacts) to every project, which makes Gradle ignore the settings-level
+// `dependencyResolutionManagement` repositories for this project's own
+// resolution. So the Zettle SDK repository has to be declared here too,
+// alongside FGP's, rather than only in settings.gradle.kts.
+repositories {
+    maven {
+        url = uri("https://maven.pkg.github.com/iZettle/sdk-android")
+        credentials {
+            username = providers.gradleProperty("github.username").orNull
+                ?: System.getenv("GITHUB_USERNAME")
+            password = providers.gradleProperty("github.token").orNull
+                ?: System.getenv("GITHUB_TOKEN")
+        }
+    }
 }
 
 android {
@@ -11,12 +27,8 @@ android {
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
-
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_11.toString()
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     defaultConfig {
@@ -36,6 +48,12 @@ android {
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.getByName("debug")
         }
+    }
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
     }
 }
 
