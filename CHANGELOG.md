@@ -10,8 +10,6 @@
 
 ### Bug Fixes
 
-* bump AGP to 8.13.0 ([c39009c](https://github.com/juliansteenbakker/zettle_sdk/commit/c39009c462984e43bffcb52fdd7d486b82f671db))
-* bump example Gradle wrapper to 8.14.5 ([359b780](https://github.com/juliansteenbakker/zettle_sdk/commit/359b7807411277661815d45f6554665eef7cad35))
 * bump Kotlin to 2.2.21 ([3bc95ed](https://github.com/juliansteenbakker/zettle_sdk/commit/3bc95ede1d194307cb5f281eaeff14ea31f3d0a8))
 * remove hardcoded JDK path and placeholder Maven credentials from example gradle.properties ([a7b7de4](https://github.com/juliansteenbakker/zettle_sdk/commit/a7b7de45874e92a68fbd944e667969382c7ac8f5))
 
