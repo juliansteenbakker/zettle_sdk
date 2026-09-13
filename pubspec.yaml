@@ -1,6 +1,6 @@
 name: zettle_sdk
 description: "A flutter plugin for the PayPal Point of Sale (formerly Zettle by Paypal & iZettle) Android and iOS SDK."
-version: 1.0.0
+version: 1.1.0
 homepage: https://github.com/juliansteenbakker/zettle_sdk
 
 environment:
