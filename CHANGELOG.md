@@ -1,3 +1,24 @@
+# Changelog
+
+## [1.1.0](https://github.com/juliansteenbakker/zettle_sdk/compare/v1.0.0...v1.1.0) (2026-09-13)
+
+
+### Features
+
+* migrate to AGP 9 and Kotlin Gradle DSL ([a6f7999](https://github.com/juliansteenbakker/zettle_sdk/commit/a6f79991bc3d80dc0a3978d2093bbb7d135af245))
+
+
+### Bug Fixes
+
+* bump Kotlin to 2.2.21 ([3bc95ed](https://github.com/juliansteenbakker/zettle_sdk/commit/3bc95ede1d194307cb5f281eaeff14ea31f3d0a8))
+* remove hardcoded JDK path and placeholder Maven credentials from example gradle.properties ([a7b7de4](https://github.com/juliansteenbakker/zettle_sdk/commit/a7b7de45874e92a68fbd944e667969382c7ac8f5))
+
+
+### Dependencies
+
+* bump org.mockito:mockito-core from 5.0.0 to 5.23.0 in /android ([5f08257](https://github.com/juliansteenbakker/zettle_sdk/commit/5f082579049105f0ceb21bc339da76dce8bb0907))
+* bump zettleVersion from 2.38.2 to 2.52.1 in /android ([c8729a0](https://github.com/juliansteenbakker/zettle_sdk/commit/c8729a0f39196e6a3c0a6e22e52996826eee08b0))
+
 ## 1.0.0
 
 ### Added
