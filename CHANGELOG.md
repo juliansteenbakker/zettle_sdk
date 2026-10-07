@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/juliansteenbakker/zettle_sdk/compare/v1.1.0...v1.1.1) (2026-10-07)
+
+
+### Dependencies
+
+* bump org.mockito:mockito-core from 5.23.0 to 5.24.0 in /android ([#11](https://github.com/juliansteenbakker/zettle_sdk/issues/11)) ([92940f5](https://github.com/juliansteenbakker/zettle_sdk/commit/92940f54fa41edf5a1a162fd99b346dfdb58f83f))
+
 ## [1.1.0](https://github.com/juliansteenbakker/zettle_sdk/compare/v1.0.0...v1.1.0) (2026-09-13)
 
 
